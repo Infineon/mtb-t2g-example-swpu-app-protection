@@ -14,7 +14,7 @@ The device used in this code example (CE) is:
 
 The board used for testing is:
 
-- TRAVEO™ T2G evaluation kit (`KIT_T2G-B-H_EVK`, `KIT_T2G_B-H_LITE`)
+- TRAVEO™ T2G evaluation kit (`KIT_T2G-B-H_EVK`, `KIT_T2G-B-H_LITE`)
 
 ## Scope of work
 
