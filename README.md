@@ -14,7 +14,7 @@ The device used in this code example (CE) is:
 
 The board used for testing is:
 
-- TRAVEO™ T2G evaluation kit (`KIT_T2G-B-H_EVK`, `KIT_T2G-B-H_LITE`)
+- TRAVEO™ T2G evaluation kit ([KIT_T2G-B-H_EVK](https://www.infineon.com/cms/en/product/evaluation-boards/kit_t2g-b-h_evk/), [KIT_T2G-B-H_LITE](https://www.infineon.com/cms/en/product/evaluation-boards/kit_t2g-b-h_lite/))
 
 ## Scope of work
 
@@ -46,14 +46,17 @@ The Protection Unit of TRAVEO™ T2G MCU supports the following features:
     - eFuse Read Protection Unit (ERPU)
     - eFuse Write Protection Unit (EWPU)
 
-More details can be found in [Technical Reference Manual (TRM)](https://www.cypress.com/documentation/technical-reference-manuals/traveo-ii-automotive-body-controller-high-family), [Registers TRM](https://www.cypress.com/documentation/technical-reference-manuals/traveo-t2g-tvii-b-h-8m-registers-body-controller-high) and [Data Sheet](https://www.cypress.com/documentation/datasheets/cyt4bf-datasheet-32-bit-arm-cortex-m7-microcontroller-traveo-ii-family).
+More details can be found in [Technical Reference Manual (TRM)](https://www.infineon.com/dgdl/?fileId=5546d4627600a6bc017600bfae720007), [Registers TRM](https://www.infineon.com/dgdl/?fileId=5546d4627600a6bc017600be2aef0004) and [Data Sheet](https://www.infineon.com/dgdl/?fileId=5546d46275b79adb0175dc8387f93228).
 
 ## Hardware setup
 
 This CE has been developed for:
+- TRAVEO™ T2G evaluation kit ([KIT_T2G-B-H_EVK](https://www.infineon.com/cms/en/product/evaluation-boards/kit_t2g-b-h_evk/))<BR>
+<img src="./images/KIT_T2G-B-H_EVK.gif"/><BR>
+No changes are required from the board's default settings.
 
-- TRAVEO™ T2G evaluation kit (`KIT_T2G-B-H_EVK`)<BR>
-<img src="./images/KIT_T2G-B-H_EVK.gif" width="800" /><BR>
+- TRAVEO™ T2G Body High Lite evaluation kit ([KIT_T2G-B-H_LITE](https://www.infineon.com/cms/en/product/evaluation-boards/kit_t2g-b-h_lite/))<BR>
+<img src="./images/KIT_T2G-B-H_LITE.gif"/><BR>
 No changes are required from the board's default settings.
 
 ## Implementation
@@ -62,50 +65,50 @@ In this CE, the FWPU is configured to protect 2 regions of the Code Flash. The o
 
 **Protect Context (PC) setting (CM0+)**  
 
-First, to achieve this CE behavior, CM7_0 and CM7_1 must be set up on different PCs: the PC for CM7_0 is 6 and the PC for CM7_1 is 7. This operation is done by CM0+ by calling [Cy_Prot_ConfigBusMaster()](https://infineon.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/group__group__prot__functions__busmaster.html#ga4b69f79e24b30f22a706e973b05dd079) and [Cy_Prot_SetActivePC()](https://infineon.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/group__group__prot__functions__busmaster.html#ga2d3a54039578a9fae98f6c7b4c4cff41) in its initialization phase.
+First, to achieve this CE behavior, CM7_0 and CM7_1 must be set up on different PCs: the PC for CM7_0 is 6 and the PC for CM7_1 is 7. This operation is done by CM0+ by calling <a href="https://infineon.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/group__group__prot__functions__busmaster.html#ga4b69f79e24b30f22a706e973b05dd079"><i>Cy_Prot_ConfigBusMaster()</i></a> and <a href="https://infineon.github.io/mtb-pdl-cat1/pdl_api_reference_manual/html/group__group__prot__functions__busmaster.html#ga2d3a54039578a9fae98f6c7b4c4cff41"><i>Cy_Prot_SetActivePC()</i></a> in its initialization phase.
 
 **Supervisory Flash (SFLASH) configuration (CM0+)**  
 
-The FWPU settings which placed in SFLASH is prepared in `main.c` of CM0+, that set the protection as follows:
+The FWPU settings which placed in SFLASH is prepared in *main.c* of CM0+, that set the protection as follows:
 
-- `N_FWPU` (2): The number of FWPU objects. FWPU has up to 16 regions.
+- *N_FWPU* (2): The number of FWPU objects. FWPU has up to 16 regions.
 
 The FWPU region 0 is set as below:
 
-- `FWPU0_SL` (0x103F8000): Configures the base address of FWPU region 0. This value is the start address of third sector of Code Flash.
-- `FWPU0_SIZE` (0x8000): Configures the size of protection area from FWPU0_SL.
-- `FWPU0_SL_ATT`: Configures the slave attribute. This element sets the attribute for write access to Flash memory.<BR><img src="./images/SWPU_attribute.png" width="480" />
-  - `PC_MASK`: Set the bit [6]/[7] as 0 to protect this region from be accessed from both CM7_0/1.
-  - `NS`/`PW`/`UW`: Set these bits to 1 (In this CE, the state of secure/non-secure and priviledge/user are not used as decide protection attribute).
-- `FWPU0_MS_ATT`: Configures the master attribute. This element sets the attribute to access the `FWPU0_SL_ATT` via calling SROM API `WriteSWPU()`. This value is given the same value with `FWPU0_SL_ATT` to disable access.
+- *FWPU0_SL* (0x103F8000): Configures the base address of FWPU region 0. This value is the start address of third sector of Code Flash.
+- *FWPU0_SIZE* (0x8000): Configures the size of protection area from FWPU0_SL.
+- *FWPU0_SL_ATT*: Configures the slave attribute. This element sets the attribute for write access to Flash memory.<BR><img src="./images/SWPU_attribute.png" width="480" />
+  - *PC_MASK*: Set the bit [6]/[7] as 0 to protect this region from be accessed from both CM7_0/1.
+  - *NS*/*PW*/*UW*: Set these bits to 1 (In this CE, the state of secure/non-secure and priviledge/user are not used as decide protection attribute).
+- *FWPU0_MS_ATT*: Configures the master attribute. This element sets the attribute to access the *FWPU0_SL_ATT* via calling SROM API *WriteSWPU()*. This value is given the same value with *FWPU0_SL_ATT* to disable access.
 
 The FWPU region 1 is set as below:
 
-- `FWPU1_SL` (0x10400000): The meaning is same as `FWPU0_SL`, but this is for the FWPU region 1.
-- `FWPU1_SIZE` (0x8000): The meaning is same as `FWPU0_SIZE`, but this is for the FWPU region 1.
-- `FWPU1_SL_ATT`/`FWPU1_MS_ATT`: The meaning is same as `FWPU0_SL_ATT`/`FWPU0_MS_ATT`, but this is for the FWPU region 1. To enable the access from CM7_0, PC_MASK[6] is set to 1.
+- *FWPU1_SL* (0x10400000): The meaning is same as *FWPU0_SL*, but this is for the FWPU region 1.
+- *FWPU1_SIZE* (0x8000): The meaning is same as *FWPU0_SIZE*, but this is for the FWPU region 1.
+- *FWPU1_SL_ATT*/*FWPU1_MS_ATT*: The meaning is same as *FWPU0_SL_ATT*/*FWPU0_MS_ATT*, but this is for the FWPU region 1. To enable the access from CM7_0, PC_MASK[6] is set to 1.
 
 **Miscellaneous settings**  
 
 - **STDIO setting (CM0+)**
-  - Calling [cy_retarget_io_init()](https://infineon.github.io/retarget-io/html/group__group__board__libs.html#ga21265301bf6e9239845227c2aead9293) function to use UART as STDIN/STDOUT
+  - Calling <a href="https://infineon.github.io/retarget-io/html/group__group__board__libs.html#ga21265301bf6e9239845227c2aead9293"><i>cy_retarget_io_init()</i></a> function to use UART as STDIN/STDOUT
     - Initialize the pin specified by CYBSP_DEBUG_UART_TX as UART TX, the pin specified by CYBSP_DEBUG_UART_RX as UART RX (these pins are connected to KitProg3 COM port)
     - The serial port parameters become to 8N1 and 115200 baud
-  - The UART receiving interrupt is configured in the [cyhal_uart_enable_event()](https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__uart.html#ga4dae4cef7dbf1d7935fe6dd6d31f282e) function
-  - The interrupt service routine (ISR) is registered by the [cyhal_uart_register_callback()](https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__uart.html#gae26bab64811713b1d69170352fe32c20) function
+  - The UART receiving interrupt is configured in the <a href="https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__uart.html#ga4dae4cef7dbf1d7935fe6dd6d31f282e"><i>cyhal_uart_enable_event()</i></a> function
+  - The interrupt service routine (ISR) is registered by the <a href="https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__uart.html#gae26bab64811713b1d69170352fe32c20"><i>cyhal_uart_register_callback()</i></a> function
 
 - **Code Flash initialization (CM0+)**
-  - Calling [cyhal_flash_init()](https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__flash.html#ga669e3789204d0cf9610a85f26a28c55b) function and `Cy_Flashc_MainWriteEnable()` function to initialize Code Flash to be able to write/erase from CM7_0/1
+  - Calling <a href="https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__flash.html#ga669e3789204d0cf9610a85f26a28c55b"><i>cyhal_flash_init()</i></a> function and *Cy_Flashc_MainWriteEnable()* function to initialize Code Flash to be able to write/erase from CM7_0/1
 
 - **Enabling CM7_0/1 (CM0+)**
-  - The CM7_0/1 core will be enabled by calling `Cy_SysEnableCM7()` function with their top address where the vector table exists
+  - The CM7_0/1 core will be enabled by calling *Cy_SysEnableCM7()* function with their top address where the vector table exists
 
 **Confirming protection effects**  
 
-- When the CM0+ received the command through the terminal, interrupt occur and the received character can be read by calling [cyhal_uart_read_async()](https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__uart.html#ga00ef108f7ee7beba3d5090b2e506b54f), then it reflects to instructions for the CM7_0/1 by `processKeyPress()`
+- When the CM0+ received the command through the terminal, interrupt occur and the received character can be read by calling <a href="https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__uart.html#ga00ef108f7ee7beba3d5090b2e506b54f"><i>cyhal_uart_read_async()</i></a>, then it reflects to instructions for the CM7_0/1 by *processKeyPress()*
 - The instructions and responses are delivered via SRAM which are commonly used between 3 cores
-- The CM7_0/1 performs flash erase or write access by calling [cyhal_flash_erase()](https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__flash.html#ga10b68f24a5c9a7c929a2c1fa3af89858) or [cyhal_flash_program()](https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__flash.html#ga66a23d2dfbe01d027f8e9318999b7e19) when they detects the instruction. These will be rejected or granted according to the current FWPU settings.
-- Also they performs changing the FWPU protection settings by calling `Cy_Srom_CallApi()`. This actually implements the `ReadFWPU()` and `WriteFWPU()` SROM APIs described in the [TRM](https://www.cypress.com/documentation/technical-reference-manuals/traveo-ii-automotive-body-controller-high-family). These accesses are also controlled according to the current FWPU settings.
+- The CM7_0/1 performs flash erase or write access by calling <a href="https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__flash.html#ga10b68f24a5c9a7c929a2c1fa3af89858"><i>cyhal_flash_erase()</i></a> or <a href="https://infineon.github.io/mtb-hal-cat1/html/group__group__hal__flash.html#ga66a23d2dfbe01d027f8e9318999b7e19"><i>cyhal_flash_program()</i></a> when they detects the instruction. These will be rejected or granted according to the current FWPU settings.
+- Also they performs changing the FWPU protection settings by calling *Cy_Srom_CallApi()*. This actually implements the *ReadFWPU()* and *WriteFWPU()* SROM APIs described in the [TRM](https://www.infineon.com/dgdl/?fileId=5546d4627600a6bc017600bfae720007). These accesses are also controlled according to the current FWPU settings.
 
 ## Run and Test
 
@@ -121,16 +124,16 @@ After code compilation and the digital signature addition, perform the following
     - In the **Quick Panel**, scroll down, and click **[Project Name] Program (KitProg3_MiniProg4)**.
 4. After programming, the CE starts automatically. Confirm that the messages are displayed on the UART terminal.<BR><img src="./images/terminal.png" width="640" />
 
-5. You can debug the example to step through the code. In the IDE, use the **[Project Name] Debug (KitProg3_MiniProg4)** configuration in the **Quick Panel**. For details, see the "Program and debug" section in the [Eclipse IDE for ModusToolbox™ software user guide](https://www.cypress.com/MTBEclipseIDEUserGuide).
+5. You can debug the example to step through the code. In the IDE, use the **[Project Name] Debug (KitProg3_MiniProg4)** configuration in the **Quick Panel**. For details, see the "Program and debug" section in the [Eclipse IDE for ModusToolbox™ software user guide](https://www.infineon.com/dgdl/?fileId=8ac78c8c8386267f0183a8d7043b58ee).
 
-**Note:** **(Only while debugging)** On the CM7 CPU, some code in `main()` may execute before the debugger halts at the beginning of `main()`. This means that some code executes twice ? once before the debugger stops execution, and again after the debugger resets the program counter to the beginning of `main()`. See [KBA231071](https://community.cypress.com/docs/DOC-21143) to learn about this and for the workaround.
+**Note:** **(Only while debugging)** On the CM7 CPU, some code in *main()* may execute before the debugger halts at the beginning of *main()*. This means that some code executes twice: once before the debugger stops execution, and again after the debugger resets the program counter to the beginning of *main()*. See [KBA231071](https://community.infineon.com/t5/Knowledge-Base-Articles/PSoC-6-MCU-Code-in-main-executes-before-the-debugger-halts-at-the-first-line-of/ta-p/253856) to learn about this and for the workaround.
 
 ## References  
 
 Relevant Application notes are:
 
 - AN235305 - GETTING STARTED WITH TRAVEO™ T2G FAMILY MCUS IN MODUSTOOLBOX™
-- [AN228680](https://www.infineon.com/dgdl/Infineon-AN228680_Secure_System_Configuration_in_TRAVEO_T2G_Family-ApplicationNotes-v04_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0d3e888b67e2) - Secure system configuration in TRAVEO™ T2G family
+- [AN228680](https://www.infineon.com/dgdl/?fileId=8ac78c8c7cdc391c017d0d3e888b67e2) - Secure system configuration in TRAVEO™ T2G family
 
 ModusToolbox™ is available online:
 - <https://www.infineon.com/modustoolbox>

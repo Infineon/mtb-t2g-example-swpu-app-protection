@@ -213,10 +213,16 @@ int main(void)
     char uartReadValue;
 
     /* Initialize the device and board peripherals */
-    CY_ASSERT(cybsp_init() == CY_RSLT_SUCCESS);
+    if (cybsp_init() != CY_RSLT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
 
     /* Initialize retarget-io to use the debug UART port */
-    CY_ASSERT(cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE) == CY_RSLT_SUCCESS);
+    if (cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE) != CY_RSLT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
 
     /* The UART callback handler registration */
     cyhal_uart_register_callback(&cy_retarget_io_uart_obj, handleUartEvent, NULL);
@@ -228,7 +234,10 @@ int main(void)
                             UART_IRQ_PRIORITY, true);
 
     /* Flash initialization */
-    CY_ASSERT(cyhal_flash_init(&g_flash) == CY_RSLT_SUCCESS);
+    if (cyhal_flash_init(&g_flash) != CY_RSLT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
 
     /* Enable code flash write function */
     Cy_Flashc_MainWriteEnable();
@@ -244,10 +253,22 @@ int main(void)
            "****************** \r\n\n");
 
     /* set PC for CM7_0/1 */
-    CY_ASSERT(Cy_Prot_ConfigBusMaster(CPUSS_MS_ID_CM7_0, true, true, CY_PROT_PCMASK6) == CY_PROT_SUCCESS);
-    CY_ASSERT(Cy_Prot_SetActivePC(CPUSS_MS_ID_CM7_0, CY_PROT_PC6) == CY_PROT_SUCCESS);
-    CY_ASSERT(Cy_Prot_ConfigBusMaster(CPUSS_MS_ID_CM7_1, true, true, CY_PROT_PCMASK7) == CY_PROT_SUCCESS);
-    CY_ASSERT(Cy_Prot_SetActivePC(CPUSS_MS_ID_CM7_1, CY_PROT_PC7) == CY_PROT_SUCCESS);
+    if (Cy_Prot_ConfigBusMaster(CPUSS_MS_ID_CM7_0, true, true, CY_PROT_PCMASK6) != CY_PROT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
+    if (Cy_Prot_SetActivePC(CPUSS_MS_ID_CM7_0, CY_PROT_PC6) != CY_PROT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
+    if (Cy_Prot_ConfigBusMaster(CPUSS_MS_ID_CM7_1, true, true, CY_PROT_PCMASK7) != CY_PROT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
+    if (Cy_Prot_SetActivePC(CPUSS_MS_ID_CM7_1, CY_PROT_PC7) != CY_PROT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
 
     /* Clear shared data */
     memset(g_shared, 0, sizeof(g_shared));
